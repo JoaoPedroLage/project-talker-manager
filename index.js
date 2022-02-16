@@ -24,21 +24,21 @@ app.get('/talker', getTalkerResponse);
 
 //
 
-// Req: 2 - Create the endpoint GET /talker/:id
-async function getTalkerByIdResponse(_req, res) {
-  const FILENAME = './talker.json';
+// // Req: 2 - Create the endpoint GET /talker/:id
+// async function getTalkerByIdResponse(_req, res) {
+//   const FILENAME = './talker.json';
 
-  try {
-    const talkerData = await fs.readFile(FILENAME);
-    return res.status(200).json(JSON.parse(talkerData));
-  } catch (e) {
-    return [];
-  }
-}
+//   try {
+//     const talkerData = await fs.readFile(FILENAME);
+//     return res.status(200).json(JSON.parse(talkerData));
+//   } catch (e) {
+//     return [];
+//   }
+// }
 
-app.get('/talker:id', getTalkerByIdResponse);
+// app.get('/talker:id', getTalkerByIdResponse);
 
-//
+// //
 
 // não remova esse endpoint, e para o avaliador funcionar
 app.get('/', (_request, response) => {
