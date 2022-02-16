@@ -1,5 +1,6 @@
 const express = require('express');
-const fs = require('fs/promises');
+// const fs = require('fs');
+const fsAsync = require('fs/promises');
 const bodyParser = require('body-parser');
 
 const app = express();
@@ -13,7 +14,7 @@ async function getTalkerResponse(_req, res) {
   const FILENAME = './talker.json';
 
   try {
-    const talkerData = await fs.readFile(FILENAME);
+    const talkerData = await fsAsync.readFile(FILENAME);
     return res.status(200).json(JSON.parse(talkerData));
   } catch (e) {
     return [];
@@ -24,21 +25,26 @@ app.get('/talker', getTalkerResponse);
 
 //
 
-// // Req: 2 - Create the endpoint GET /talker/:id
-// async function getTalkerByIdResponse(_req, res) {
-//   const FILENAME = './talker.json';
+// Req: 2 - Create the endpoint GET /talker/:id
+async function getTalkerByIdResponse(req, res) {
+  const FILENAME = './talker.json';
+  const talkerData = await fsAsync.readFile(FILENAME);
+  const talkerDataArray = JSON.parse(talkerData);
+  const { id } = req.params;
+  const findId = talkerDataArray.find((data) => Number(data.id) === parseInt(id, 10));
 
-//   try {
-//     const talkerData = await fs.readFile(FILENAME);
-//     return res.status(200).json(JSON.parse(talkerData));
-//   } catch (e) {
-//     return [];
-//   }
-// }
+  if (!findId) {
+    return res.status(404).json({
+        message: 'Pessoa palestrante não encontrada',
+      }); 
+  }
 
-// app.get('/talker:id', getTalkerByIdResponse);
+  return res.status(200).json((findId));
+}
 
-// //
+app.get('/talker/:id', getTalkerByIdResponse);
+
+//
 
 // não remova esse endpoint, e para o avaliador funcionar
 app.get('/', (_request, response) => {
