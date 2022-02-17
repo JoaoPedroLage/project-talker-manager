@@ -1,19 +1,23 @@
 const express = require('express');
-// const fs = require('fs');
-const fsAsync = require('fs/promises');
 const bodyParser = require('body-parser');
 
 const app = express();
 app.use(bodyParser.json());
 
+// const fs = require('fs');
+const fsAsync = require('fs/promises');
+const crypto = require('crypto');
+
+const { emailValidation, passwordValidation } = require('./middlewares/loginValidation');
+
 const HTTP_OK_STATUS = 200;
 const PORT = '3000';
 
+const FILENAME = './talker.json';
+
 // Req: 1 - Create the endpoint GET /talker
 async function getTalkerResponse(_req, res) {
-  const FILENAME = './talker.json';
-
-  try {
+try {
     const talkerData = await fsAsync.readFile(FILENAME);
     return res.status(200).json(JSON.parse(talkerData));
   } catch (e) {
@@ -27,7 +31,6 @@ app.get('/talker', getTalkerResponse);
 
 // Req: 2 - Create the endpoint GET /talker/:id
 async function getTalkerByIdResponse(req, res) {
-  const FILENAME = './talker.json';
   const talkerData = await fsAsync.readFile(FILENAME);
   const talkerDataArray = JSON.parse(talkerData);
   const { id } = req.params;
@@ -43,6 +46,20 @@ async function getTalkerByIdResponse(req, res) {
 }
 
 app.get('/talker/:id', getTalkerByIdResponse);
+
+//
+
+// Req: 3 - Create the POST endpoint /login
+function postLogin(_req, res) {
+  const token = crypto.randomBytes(8).toString('hex');
+
+  return res.status(200).json({ token });
+}
+app.post('/login', emailValidation, passwordValidation, postLogin);
+
+//
+
+// Req: 4 - Create the POST endpoint /login
 
 //
 
