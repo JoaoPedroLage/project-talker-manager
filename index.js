@@ -4,11 +4,17 @@ const bodyParser = require('body-parser');
 const app = express();
 app.use(bodyParser.json());
 
-// const fs = require('fs');
+const fs = require('fs');
 const fsAsync = require('fs/promises');
 const crypto = require('crypto');
 
 const { emailValidation, passwordValidation } = require('./middlewares/loginValidation');
+const { auth,
+  nameValidation,
+  ageValidation,
+  dateAndRateValidation,
+  talkValidation,
+ } = require('./middlewares/getTalkerData');
 
 const HTTP_OK_STATUS = 200;
 const PORT = '3000';
@@ -26,7 +32,6 @@ try {
 }
 
 app.get('/talker', getTalkerResponse);
-
 //
 
 // Req: 2 - Create the endpoint GET /talker/:id
@@ -46,7 +51,6 @@ async function getTalkerByIdResponse(req, res) {
 }
 
 app.get('/talker/:id', getTalkerByIdResponse);
-
 //
 
 // Req: 3 - Create the POST endpoint /login
@@ -56,11 +60,26 @@ function postLogin(_req, res) {
   return res.status(200).json({ token });
 }
 app.post('/login', emailValidation, passwordValidation, postLogin);
-
 //
 
-// Req: 4 - Create the POST endpoint /login
+// Req: 4 - Create the POST endpoint /talker
+function postTalker(req, res) {
+  const talkerData = JSON.parse(fs.readFileSync(FILENAME, 'utf-8'));
+  const { name, id, age, talk } = req.body;
 
+  fs.writeFileSync(FILENAME, JSON.stringify([...talkerData, { name, id, age, talk }]));
+
+  return res.status(201).json({ name, id, age, talk });
+}
+  app.post(
+  '/talker',
+  auth,
+  nameValidation,
+  ageValidation,
+  talkValidation,
+  dateAndRateValidation,
+  postTalker,
+);
 //
 
 // não remova esse endpoint, e para o avaliador funcionar
