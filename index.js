@@ -4,12 +4,13 @@ const bodyParser = require('body-parser');
 const app = express();
 app.use(bodyParser.json());
 
-const fs = require('fs');
+// const fs = require('fs');
 const fsAsync = require('fs/promises');
 const crypto = require('crypto');
 
 const { emailValidation, passwordValidation } = require('./middlewares/loginValidation');
-const { auth,
+const { 
+  auth,
   nameValidation,
   ageValidation,
   dateAndRateValidation,
@@ -63,13 +64,17 @@ app.post('/login', emailValidation, passwordValidation, postLogin);
 //
 
 // Req: 4 - Create the POST endpoint /talker
-function postTalker(req, res) {
-  const talkerData = JSON.parse(fs.readFileSync(FILENAME, 'utf-8'));
-  const { name, id, age, talk } = req.body;
+async function postTalker(req, res) {
+  const talkerData = await fsAsync.readFile(FILENAME);
+  const talkerDataArray = JSON.parse(talkerData);
+  const { name, age, talk } = req.body;
+  const id = talkerDataArray.length + 1;
+  const talkerObj = { name, id, age, talk };
 
-  fs.writeFileSync(FILENAME, JSON.stringify([...talkerData, { name, id, age, talk }]));
+  talkerDataArray.push(talkerObj);
+  await fsAsync.writeFile(FILENAME, JSON.stringify([...talkerDataArray, talkerObj]));
 
-  return res.status(201).json({ name, id, age, talk });
+  return res.status(201).json(talkerObj);
 }
   app.post(
   '/talker',
