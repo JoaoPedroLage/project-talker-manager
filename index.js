@@ -95,8 +95,6 @@ async function updateTalkerById(req, res) {
   const talkerObj = { age, id: Number(id), name, talk };
   const findIndex = talkerDataArray.findIndex((talker) => Number(talker.id) === Number(id));
 
-  if (findIndex === -1) return res.status(404).json({ message: 'Token inválido' });
-
   await fsAsync.writeFile(FILENAME, JSON.stringify([...talkerDataArray, talkerObj]));
 
   return res.status(200).json(talkerObj);
