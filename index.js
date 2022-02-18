@@ -69,8 +69,6 @@ async function postTalker(req, res) {
   const talkerDataArray = JSON.parse(talkerData);
   const { name, age, talk } = req.body;
   const id = talkerDataArray[talkerDataArray.length - 1].id + 1;
-  console.log(id);
-
   const talkerObj = { name, id, age, talk };
 
   talkerDataArray.push(talkerObj);
