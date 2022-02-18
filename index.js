@@ -119,9 +119,6 @@ async function deleteTalkerById(req, res) {
   const { id } = req.params;
   const newTalkerDataArray = talkerDataArray.filter((talker) => Number(talker.id) !== Number(id));
 
-  if (!newTalkerDataArray) return res.status(404).json({ message: 'Token não encontrado' });
-  if (newTalkerDataArray === -1) return res.status(404).json({ message: 'Token inválido' });
-
   await fsAsync.writeFile(FILENAME, JSON.stringify(newTalkerDataArray));
 
   return res.status(204).end();
