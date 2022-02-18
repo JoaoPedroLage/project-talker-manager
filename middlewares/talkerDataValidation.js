@@ -40,7 +40,7 @@ function ageValidation(req, res, next) {
 function talkValidation(req, res, next) {
   const { talk } = req.body;
 
-  if (!talk || !talk.watchedAt || !talk.rate) {
+  if (!talk || talk.watchedAt === undefined || talk.rate === undefined) {
     return res.status(400).json({
         message: 'O campo "talk" é obrigatório e "watchedAt" e "rate" não podem ser vazios',
       });
@@ -53,7 +53,7 @@ function dateAndRateValidation(req, res, next) {
   const dateRegex = /^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/;
 
   function rateValidation() {
-    if (!Number.isInteger(Number(rate)) || Number(rate) > 5 || Number(rate) < 1) {
+    if (!Number.isInteger(Number(rate)) || Number(rate) < 1 || Number(rate) > 5) {
       return res.status(400).json({
         message: 'O campo "rate" deve ser um inteiro de 1 à 5' }); 
       }
