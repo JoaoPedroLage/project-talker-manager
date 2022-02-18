@@ -68,7 +68,9 @@ async function postTalker(req, res) {
   const talkerData = await fsAsync.readFile(FILENAME);
   const talkerDataArray = JSON.parse(talkerData);
   const { name, age, talk } = req.body;
-  const id = talkerDataArray.length + 1;
+  const id = talkerDataArray[talkerDataArray.length - 1].id + 1;
+  console.log(id);
+
   const talkerObj = { name, id, age, talk };
 
   talkerDataArray.push(talkerObj);
@@ -85,7 +87,6 @@ async function postTalker(req, res) {
   dateAndRateValidation,
   postTalker,
 );
-//
 
 // não remova esse endpoint, e para o avaliador funcionar
 app.get('/', (_request, response) => {
