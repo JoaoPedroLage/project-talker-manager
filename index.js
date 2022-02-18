@@ -40,7 +40,7 @@ async function getTalkerByIdResponse(req, res) {
   const talkerData = await fsAsync.readFile(FILENAME);
   const talkerDataArray = JSON.parse(talkerData);
   const { id } = req.params;
-  const findId = talkerDataArray.find((talker) => Number(talker.id) === parseInt(id, 10));
+  const findId = talkerDataArray.find((talker) => Number(talker.id) === Number(id));
 
   if (!findId) {
     return res.status(404).json({
@@ -71,7 +71,6 @@ async function postTalker(req, res) {
   const id = talkerDataArray[talkerDataArray.length - 1].id + 1;
   const talkerObj = { name, id, age, talk };
 
-  talkerDataArray.push(talkerObj);
   await fsAsync.writeFile(FILENAME, JSON.stringify([...talkerDataArray, talkerObj]));
 
   return res.status(201).json(talkerObj);
@@ -93,10 +92,11 @@ async function updateTalkerById(req, res) {
   const talkerDataArray = JSON.parse(talkerData);
   const { id } = req.params;
   const { name, age, talk } = req.body; 
-  const talkerObj = { age, id: parseInt(id, 10), name, talk };
-  const findIndex = talkerDataArray.findIndex((talker) => Number(talker.id) === id);
+  const talkerObj = { age, id: Number(id), name, talk };
+  const findIndex = talkerDataArray.findIndex((talker) => Number(talker.id) === Number(id));
 
-  talkerDataArray[findIndex] = talkerObj;
+  if (findIndex === -1) return res.status(404).json({ message: 'Token inválido' });
+
   await fsAsync.writeFile(FILENAME, JSON.stringify([...talkerDataArray, talkerObj]));
 
   return res.status(200).json(talkerObj);
@@ -110,6 +110,23 @@ app.put(
   dateAndRateValidation,
   updateTalkerById,
 );
+//
+
+// Req: 6 - Create the endpoint DELETE /talker/:id
+async function deleteTalkerById(req, res) {
+  const talkerData = await fsAsync.readFile(FILENAME);
+  const talkerDataArray = JSON.parse(talkerData);
+  const { id } = req.params;
+  const newTalkerDataArray = talkerDataArray.filter((talker) => Number(talker.id) !== Number(id));
+
+  if (!newTalkerDataArray) return res.status(404).json({ message: 'Token não encontrado' });
+  if (newTalkerDataArray === -1) return res.status(404).json({ message: 'Token inválido' });
+
+  await fsAsync.writeFile(FILENAME, JSON.stringify(newTalkerDataArray));
+
+  return res.status(204).end();
+}
+app.delete('/talker/:id', auth, deleteTalkerById);
 //
 
 // não remova esse endpoint, e para o avaliador funcionar
